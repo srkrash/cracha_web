@@ -111,9 +111,8 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
   }
 
   Future<void> _openScanner() async {
-    final String? scannedCode = await showDialog<String>(
-      context: context,
-      builder: (context) => const ScannerDialog(),
+    final String? scannedCode = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (context) => const ScannerScreen()),
     );
 
     if (scannedCode != null && scannedCode.isNotEmpty) {
@@ -365,14 +364,14 @@ class BarcodeDisplayScreen extends StatelessWidget {
   }
 }
 
-class ScannerDialog extends StatefulWidget {
-  const ScannerDialog({super.key});
+class ScannerScreen extends StatefulWidget {
+  const ScannerScreen({super.key});
 
   @override
-  State<ScannerDialog> createState() => _ScannerDialogState();
+  State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerDialogState extends State<ScannerDialog> {
+class _ScannerScreenState extends State<ScannerScreen> {
   final MobileScannerController _scannerController = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
@@ -385,54 +384,48 @@ class _ScannerDialogState extends State<ScannerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      clipBehavior: Clip.antiAlias,
-      child: SizedBox(
-        width: 400,
-        height: 500,
-        child: Stack(
-          alignment: Alignment.center,
-          fit: StackFit.expand,
-          children: [
-            MobileScanner(
-              controller: _scannerController,
-              fit: BoxFit.cover,
-              onDetect: (capture) {
-                final List<Barcode> barcodes = capture.barcodes;
-                if (barcodes.isNotEmpty) {
-                  final barcodeValue = barcodes.first.rawValue;
-                  if (barcodeValue != null) {
-                    Navigator.of(context).pop(barcodeValue);
-                  }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Escanear Código'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          MobileScanner(
+            controller: _scannerController,
+            fit: BoxFit.cover,
+            onDetect: (capture) {
+              final List<Barcode> barcodes = capture.barcodes;
+              if (barcodes.isNotEmpty) {
+                final barcodeValue = barcodes.first.rawValue;
+                if (barcodeValue != null) {
+                  Navigator.of(context).pop(barcodeValue);
                 }
-              },
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                onPressed: () => Navigator.of(context).pop(),
+              }
+            },
+          ),
+          const Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Text(
+              'Aponte para o código',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                backgroundColor: Colors.black54,
+                fontSize: 16,
+                letterSpacing: 1.2,
               ),
             ),
-            const Positioned(
-              bottom: 20,
-              left: 0,
-              right: 0,
-              child: Text(
-                'Aponte para o código',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  backgroundColor: Colors.black54,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
