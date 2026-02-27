@@ -388,12 +388,16 @@ class _ScannerDialogState extends State<ScannerDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+      child: SizedBox(
+        width: 400,
+        height: 500,
         child: Stack(
+          alignment: Alignment.center,
+          fit: StackFit.expand,
           children: [
             MobileScanner(
               controller: _scannerController,
+              fit: BoxFit.cover,
               onDetect: (capture) {
                 final List<Barcode> barcodes = capture.barcodes;
                 if (barcodes.isNotEmpty) {
