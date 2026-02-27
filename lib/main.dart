@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:barcode_widget/barcode_widget.dart';
+import 'package:barcode_widget/barcode_widget.dart' as bw;
+
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 void main() {
   runApp(const CrachaApp());
@@ -108,6 +110,18 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
     }
   }
 
+  Future<void> _openScanner() async {
+    final String? scannedCode = await showDialog<String>(
+      context: context,
+      builder: (context) => const ScannerDialog(),
+    );
+
+    if (scannedCode != null && scannedCode.isNotEmpty) {
+      _controller.text = scannedCode;
+      _saveCode(); // Auto envia ao ler
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -174,6 +188,12 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
                           prefixIcon: const Icon(Icons.qr_code_2),
                           filled: true,
                           fillColor: Colors.grey[50],
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.camera_alt),
+                            color: Colors.blueAccent,
+                            onPressed: _openScanner,
+                            tooltip: 'Escanear código de barras',
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
@@ -285,8 +305,8 @@ class BarcodeDisplayScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: BarcodeWidget(
-                        barcode: Barcode.code39(),
+                      child: bw.BarcodeWidget(
+                        barcode: bw.Barcode.code39(),
                         data: code,
                         width: double.infinity,
                         height: 120,
@@ -340,6 +360,75 @@ class BarcodeDisplayScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ScannerDialog extends StatefulWidget {
+  const ScannerDialog({super.key});
+
+  @override
+  State<ScannerDialog> createState() => _ScannerDialogState();
+}
+
+class _ScannerDialogState extends State<ScannerDialog> {
+  final MobileScannerController _scannerController = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+  );
+
+  @override
+  void dispose() {
+    _scannerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+        child: Stack(
+          children: [
+            MobileScanner(
+              controller: _scannerController,
+              onDetect: (capture) {
+                final List<Barcode> barcodes = capture.barcodes;
+                if (barcodes.isNotEmpty) {
+                  final barcodeValue = barcodes.first.rawValue;
+                  if (barcodeValue != null) {
+                    Navigator.of(context).pop(barcodeValue);
+                  }
+                }
+              },
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            const Positioned(
+              bottom: 20,
+              left: 0,
+              right: 0,
+              child: Text(
+                'Aponte para o código',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  backgroundColor: Colors.black54,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
