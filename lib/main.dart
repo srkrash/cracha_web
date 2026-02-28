@@ -315,7 +315,7 @@ class BarcodeDisplayScreen extends StatelessWidget {
                         ],
                       ),
                       child: bw.BarcodeWidget(
-                        barcode: bw.Barcode.code39(),
+                        barcode: bw.Barcode.code128(),
                         data: code,
                         width: double.infinity,
                         height: 120,
