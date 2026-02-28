@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:barcode_widget/barcode_widget.dart' as bw;
 
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 void main() {
   runApp(const CrachaApp());
@@ -111,11 +111,21 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
   }
 
   Future<void> _openScanner() async {
-    final String? scannedCode = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (context) => const ScannerScreen()),
+    String? scannedCode = await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Escanear Código',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 500,
+      cameraFace: CameraFace.back,
+      scanFormat: ScanFormat.ONLY_BARCODE,
     );
 
-    if (scannedCode != null && scannedCode.isNotEmpty) {
+    if (scannedCode != null && scannedCode != '-1' && scannedCode.isNotEmpty) {
       _controller.text = scannedCode;
       _saveCode(); // Auto envia ao ler
     }
@@ -355,73 +365,6 @@ class BarcodeDisplayScreen extends StatelessWidget {
                     size: 28,
                   ),
                 ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ScannerScreen extends StatefulWidget {
-  const ScannerScreen({super.key});
-
-  @override
-  State<ScannerScreen> createState() => _ScannerScreenState();
-}
-
-class _ScannerScreenState extends State<ScannerScreen> {
-  final MobileScannerController _scannerController = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
-  );
-
-  @override
-  void dispose() {
-    _scannerController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Escanear Código'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      backgroundColor: Colors.black,
-      extendBodyBehindAppBar: true,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          MobileScanner(
-            controller: _scannerController,
-            fit: BoxFit.cover,
-            onDetect: (capture) {
-              final List<Barcode> barcodes = capture.barcodes;
-              if (barcodes.isNotEmpty) {
-                final barcodeValue = barcodes.first.rawValue;
-                if (barcodeValue != null) {
-                  Navigator.of(context).pop(barcodeValue);
-                }
-              }
-            },
-          ),
-          const Positioned(
-            bottom: 40,
-            left: 0,
-            right: 0,
-            child: Text(
-              'Aponte para o código',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                backgroundColor: Colors.black54,
-                fontSize: 16,
-                letterSpacing: 1.2,
               ),
             ),
           ),
