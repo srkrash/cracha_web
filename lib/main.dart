@@ -260,6 +260,14 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Text(
+          'Fay Klagenberg - AtmaTech - 2026',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black38, fontSize: 12),
+        ),
+      ),
     );
   }
 }
@@ -386,6 +394,14 @@ class BarcodeDisplayScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Text(
+          'Fay Klagenberg - AtmaTech - 2026',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black38, fontSize: 12),
+        ),
       ),
     );
   }
