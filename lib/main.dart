@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:barcode_widget/barcode_widget.dart' as bw;
+import 'package:flutter/foundation.dart';
+import 'pwa_helper.dart';
 
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
@@ -235,6 +237,21 @@ class _InputCodeScreenState extends State<InputCodeScreen> {
                           ),
                         ),
                       ),
+                      if (kIsWeb) ...[
+                        const SizedBox(height: 16),
+                        TextButton.icon(
+                          onPressed: () async {
+                            await promptPwaInstall();
+                          },
+                          icon: const Icon(Icons.install_mobile),
+                          label: const Text(
+                            'Instalar App / Adicionar à Tela Inicial',
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.blueAccent,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
