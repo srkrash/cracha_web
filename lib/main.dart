@@ -306,11 +306,7 @@ class BarcodeDisplayScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.verified_user_rounded,
-                      color: Colors.green,
-                      size: 48,
-                    ),
+                    Image.asset('assets/logo_atmatech.png', height: 80),
                     const SizedBox(height: 16),
                     const Text(
                       'Crachá Digital',
